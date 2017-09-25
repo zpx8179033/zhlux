@@ -73,27 +73,33 @@
 var _baseClass = __webpack_require__(1);
 
 (function (global) {
-    var status = {
-        currentIndex: 0
-    };
+    var debug = true;
     global.zhlux = {
         tasks: [],
         registerTask: function registerTask(task) {
             this.tasks.push(task);
         },
-        dispatcher: function dispatcher(taskName, data) {
+        dispatcher: function dispatcher(oldState, taskName, data) {
             var filterTasks = this.tasks.filter(function (item) {
                 if (item.name === taskName) {
-                    item.action(data);
+                    item.action(oldState, data);
                 }
+                return item.action;
             });
+            if (!filterTasks instanceof Array) {
+                console.error('error!param error!');
+            } else if (filterTasks instanceof Array && filterTasks.length === 0) {
+                if (debug) {
+                    console.log('warning! ' + taskName + ' has no action !');
+                }
+            }
         }
     };
 })(window);
-zhlux.registerTask(new _baseClass.Task('add', new _baseClass.Action(function (data) {
-    console.log(++data);
+zhlux.registerTask(new _baseClass.Task('add', new _baseClass.Action(function (oldState, data) {
+    console.log({ name: oldState.name, age: oldState.age + data });
 })));
-zhlux.dispatcher('add', 2);
+zhlux.dispatcher({ name: 'jack', age: 15 }, 'add', 2);
 
 /***/ }),
 /* 1 */
